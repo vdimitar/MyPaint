@@ -10,12 +10,15 @@ namespace MyPaint
         private Point firstPoint = Point.Empty;
         private ToolStripButton currentTool = null;
         private Bitmap bitmap;
+        private Pen currentPen;
+        private const int EraserSize = 10;  // You can adjust this size for your eraser
 
         public Form1()
         {
             InitializeComponent();
 
             bitmap = new Bitmap(pictureBox1.Width, pictureBox1.Height);
+            currentPen = new Pen(Color.Black);
 
             toolStripButton1.Click += (sender, e) =>
             {
@@ -35,6 +38,22 @@ namespace MyPaint
             toolStripButton4.Click += (sender, e) =>
             {
                 currentTool = toolStripButton4;
+            };
+
+            toolStripButton5.Click += (sender, e) =>
+            {
+                currentTool = toolStripButton5;
+            };
+
+            toolStripButton6.Click += (sender, e) =>
+            {
+                using (ColorDialog colorDialog = new ColorDialog())
+                {
+                    if (colorDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        currentPen.Color = colorDialog.Color;
+                    }
+                }
             };
         }
 
@@ -71,13 +90,20 @@ namespace MyPaint
 
         private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
         {
-            if (isDrawing && currentTool == toolStripButton1)
+            if (isDrawing)
             {
                 using (Graphics g = Graphics.FromImage(bitmap))
                 {
-                    g.DrawLine(Pens.Black, firstPoint, e.Location);
+                    if (currentTool == toolStripButton1)
+                    {
+                        g.DrawLine(currentPen, firstPoint, e.Location);
+                        firstPoint = e.Location;
+                    }
+                    else if (currentTool == toolStripButton5)  // eraser tool
+                    {
+                        g.FillRectangle(Brushes.White, e.X - EraserSize / 2, e.Y - EraserSize / 2, EraserSize, EraserSize);
+                    }
                 }
-                firstPoint = e.Location;
                 pictureBox1.Refresh();
             }
         }
@@ -90,17 +116,17 @@ namespace MyPaint
                 {
                     if (currentTool == toolStripButton2)
                     {
-                        g.DrawLine(Pens.Black, firstPoint, e.Location);
+                        g.DrawLine(currentPen, firstPoint, e.Location);
                     }
                     else if (currentTool == toolStripButton3)
                     {
                         Rectangle rect = GetRectangleFromPoints(firstPoint, e.Location);
-                        g.DrawRectangle(Pens.Black, rect);
+                        g.DrawRectangle(currentPen, rect);
                     }
                     else if (currentTool == toolStripButton4)
                     {
                         Rectangle rect = GetRectangleFromPoints(firstPoint, e.Location);
-                        g.DrawEllipse(Pens.Black, rect);
+                        g.DrawEllipse(currentPen, rect);
                     }
                 }
                 pictureBox1.Refresh();
@@ -119,3 +145,4 @@ namespace MyPaint
         }
     }
 }
+
