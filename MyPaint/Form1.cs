@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Drawing.Printing;
 using System.Windows.Forms;
@@ -12,6 +12,10 @@ namespace MyPaint
         private ToolStripButton currentTool = null;
         private Bitmap bitmap;
         private Pen currentPen;
+
+        private const int EraserSize = 10; // You can adjust this size for your eraser
+
+
         private const int EraserSize = 10; // You can adjust this size for your eraser
 
 
